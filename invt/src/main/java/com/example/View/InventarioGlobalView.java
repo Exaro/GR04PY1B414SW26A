@@ -28,6 +28,7 @@ public class InventarioGlobalView {
     private Button btnGenerarReporteEscrito;
     private Button btnEliminarProducto;
     private Button btnPrueba;
+    private Button btnPruebaMov;
 
     private ObservableList<Producto> productos;
     private FilteredList<Producto> productosFiltrados;
@@ -72,13 +73,14 @@ public class InventarioGlobalView {
         btnGenerarReporteEscrito = new Button("📝 Reporte de Tienda");
         btnEliminarProducto = new Button("❌ Dar de Baja Prenda");
         btnPrueba = new Button("Prueba");
+        btnPruebaMov = new Button("Prueba Movimientos");
 
         btnAgregarProducto.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;");
         btnNuevaTransaccion.setStyle("-fx-background-color: #e67e22; -fx-text-fill: white; -fx-font-weight: bold;");
         btnGenerarReporteEscrito.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
         btnEliminarProducto.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white;");
         btnPrueba.setStyle("-fx-background-color: #9b59b6; -fx-text-fill: white;");
-
+        btnPruebaMov.setStyle("-fx-background-color: #16a085; -fx-text-fill: white;");
         totalPrendasLabel = new Label();
         valorBodegaLabel = new Label();
         alertaStockLabel = new Label();
@@ -87,7 +89,7 @@ public class InventarioGlobalView {
         // LAYOUTS
         HBox topBar = new HBox(15, new Label("Filtrar:"), filtroInput);
         topBar.setPadding(new Insets(5, 0, 5, 0));
-        HBox barraBotones = new HBox(10, btnAgregarProducto, btnNuevaTransaccion, btnGenerarReporteEscrito, btnEliminarProducto, btnPrueba);
+        HBox barraBotones = new HBox(10, btnAgregarProducto, btnNuevaTransaccion, btnGenerarReporteEscrito, btnEliminarProducto, btnPrueba, btnPruebaMov);
         VBox infoPanel = new VBox(8, totalPrendasLabel, valorBodegaLabel, alertaStockLabel);
         infoPanel.setPadding(new Insets(10));
         infoPanel.setStyle("-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 5;");
@@ -113,7 +115,7 @@ public class InventarioGlobalView {
 
         alertaStockLabel.textProperty().bind(Bindings.createStringBinding(() -> {
             long criticos = productos.stream().filter(p -> p.getStock() <= 5).count();
-            return criticos > 0 ? "⚠️ ¡Alerta! Hay " + criticos + " prenda(s) con stock crítico (5 o menos unidades)." : "✅ Niveles de stock estables en bodega.";
+            return criticos > 0 ? "¡Alerta! Hay " + criticos + " prenda(s) con stock crítico (5 o menos unidades)." : "✅ Niveles de stock estables en bodega.";
         }, productos));
 
         Scene scene = new Scene(root, 900, 650);
@@ -130,4 +132,5 @@ public class InventarioGlobalView {
     public Button getBtnGenerarReporteEscrito() { return btnGenerarReporteEscrito; }
     public Button getBtnEliminarProducto() { return btnEliminarProducto; }
     public Button getBtnPrueba() { return btnPrueba; }
+    public Button getBtnPruebaMov() { return btnPruebaMov; }
 }

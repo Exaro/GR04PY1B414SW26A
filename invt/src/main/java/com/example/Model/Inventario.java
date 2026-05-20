@@ -6,107 +6,86 @@ import java.util.List;
 
 public class Inventario {
 
-    private Date fechaActualizacion; // Usamos Date para mayor precisión en bodega
+    private Date fechaActualizacion;
     private String descripcion;
     
-    public Encargado encargado; 
-
-    // Listas para almacenar todo lo que ocurre en la tienda (Multiplicidades * del UML)
     public List<MovimientoProducto> movimientos;
-    public List<Historial> historiales;
     public List<Reporte> reportesGenerados;
-    public Producto producto;
+    public List<Historial> historialTransacciones;
+    private ProductoControl controlProductos; 
 
-    // Constructor
-    public Inventario(String descripcion, Encargado encargado) {
-        this.producto = null;
-        this.fechaActualizacion = new Date(); // Inicia con la fecha actual
+    public Inventario(String descripcion, ProductoControl controlProductos) {
+        this.fechaActualizacion = new Date();
         this.descripcion = descripcion;
-        this.encargado = encargado;
-        
+        this.controlProductos = controlProductos;
         this.movimientos = new ArrayList<>();
-        this.historiales = new ArrayList<>();
         this.reportesGenerados = new ArrayList<>();
-    }
-
-    public Producto buscarProducto(String id) {
-        return producto.accederProducto(id).buscarProducto(id);
+        this.historialTransacciones = new ArrayList<>();
     }
 
     public void registrarEntrada(String id, int cantidad) {
-        int contadorHistorial = historiales.size() + 1;
-        Producto p = buscarProducto(id);
+        Producto p = controlProductos.buscarProducto(id);
         if (p != null && cantidad > 0) {
-            int stockViejo = p.getStock();
-            p.actualizarStock(stockViejo + cantidad);
-            this.fechaActualizacion = new Date(); // Actualizamos la última fecha de movimiento
-
-            // CREACIÓN AUTOMÁTICA DEL HISTORIAL
-            String idHist = "HIST-" + (contadorHistorial++);
-            String desc = "Ingreso manual de stock para: " + p.getNombre();
-            Historial h = new Historial("H-" + id, new Date(), "Ingreso de producto", stockViejo, p.getStock());
-            h.registrar();
+            MovimientoProducto mov = new MovimientoProducto("MOV-IN-" + (movimientos.size() + 1));
             
-            historiales.add(h);
-            h.registrar(); // Lo imprime/guarda en consola
+            // Constructor limpio sin precio ni marca quemados
+            DetalleMovimiento dm = new DetalleMovimiento("DET-" + (mov.detalle.size() + 1), "ENTRADA", cantidad, p);
+            mov.agregarDetalle(dm);
+            
+            mov.registrarMovimientoP();
+            movimientos.add(mov);
+            
+            this.fechaActualizacion = new Date();
         } else {
-            System.out.println("[ERROR] No se pudo registrar la entrada. Producto no encontrado o cantidad inválida.");
+            System.out.println("[ERROR] No se pudo registrar la entrada. Producto no encontrado.");
         }
     }
 
-    /**
-     * Registra una salida simple en bodega, valida que no quede stock negativo
-     * y genera automáticamente un registro en el Historial.
-     */
     public void registrarSalida(String id, int cantidad) {
-        Producto p = buscarProducto(id);
-        int contadorHistorial = historiales.size() + 1; 
+        Producto p = controlProductos.buscarProducto(id);
         if (p != null && cantidad > 0) {
-            int stockViejo = p.getStock();
-            
-            if (stockViejo >= cantidad) {
-                p.actualizarStock(stockViejo - cantidad);
+            if (p.getStock() >= cantidad) {
+                MovimientoProducto mov = new MovimientoProducto("MOV-OUT-" + (movimientos.size() + 1));
+                DetalleMovimiento dm = new DetalleMovimiento("DET-" + (mov.detalle.size() + 1), "SALIDA", cantidad, p);
+                mov.agregarDetalle(dm);
+                
+                mov.registrarMovimientoP();
+                movimientos.add(mov);
+                
                 this.fechaActualizacion = new Date();
-
-                // CREACIÓN AUTOMÁTICA DEL HISTORIAL
-                String idHist = "HIST-" + (contadorHistorial++);
-                String desc = "Salida/Descarga manual de stock para: " + p.getNombre();
-                Historial h = new Historial("H-" + id, new Date(), "Salida de producto", stockViejo, p.getStock());
-                h.registrar();
-
-                historiales.add(h);
-                h.registrar();
             } else {
-                System.out.println("[ERROR] Stock insuficiente para '" + p.getNombre() + "'. Disponibles: " + stockViejo);
+                System.out.println("[ERROR] Stock insuficiente para '" + p.getNombre() + "'. Disponibles: " + p.getStock());
             }
         } else {
             System.out.println("[ERROR] No se pudo registrar la salida.");
         }
     }
 
-    /**
-     * Devuelve la lista de todos los movimientos (entradas/salidas) registrados.
-     */
     public List<MovimientoProducto> verMovimientos() {
+        System.out.println("\n==================================================");
+        System.out.println("          SISTEMA DE AUDITORÍA: BODEGA            ");
+        System.out.println("==================================================");
+        
+        if (this.movimientos.isEmpty()) {
+            System.out.println("[INFO] No se han registrado movimientos en esta sesión.");
+        } else {
+            System.out.println("Mostrando un total de (" + movimientos.size() + ") transacciones:\n");
+            
+            for (MovimientoProducto mp : movimientos) {
+                System.out.println("» Transacción: " + mp.getIdMovimiento() + " | Fecha: " + mp.getFecha());
+                
+                // Recorremos los detalles de este movimiento específico
+                for (DetalleMovimiento dm : mp.detalle) {
+                    String accion = dm.getTipo().equalsIgnoreCase("ENTRADA") ? "[ENTRADA]" : "[SALIDA]";
+                    System.out.println("  • " + accion + " " + dm.getProducto().getNombre() + 
+                                       " (" + dm.getProducto().getMarca() + ") x" + dm.getCantidadProductos() + " uds.");
+                }
+                System.out.println("--------------------------------------------------");
+            }
+        }
+        System.out.println("==================================================\n");
+        
+        // Seguimos retornando la lista por si el controlador la necesita para una tabla gráfica
         return this.movimientos;
     }
-
-    public Reporte generarReporte() {
-        int contadorReportes = reportesGenerados.size() + 1;
-        String idRep = "REP-BAJO-" + (contadorReportes++);
-        Date ahora = new Date();
-        
-        // 1. Instanciamos el reporte pasándole solo sus datos básicos
-        Reporte reporteBajo = new Reporte(idRep, ahora, ahora, "Informe Especial: Alerta de Stock Crítico");
-        
-        // 2. Llamamos al método que ahora es vacío () ya que no requiere productos
-        reporteBajo.generarReporte(); 
-        
-        // 3. Lo guardamos en el histórico de reportes del inventario
-        reportesGenerados.add(reporteBajo);
-        
-        return reporteBajo;
-    }
-
-  
 }

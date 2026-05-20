@@ -1,8 +1,6 @@
 package com.example.Controller;
 
-import com.example.Model.Producto;
-import com.example.Model.ProductoControl;
-import com.example.Model.Reporte;
+import com.example.Model.*;
 import com.example.View.InventarioGlobalView;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -13,10 +11,12 @@ import java.util.Optional;
 public class InventarioController {
 
     private InventarioGlobalView vista;
+    private Inventario inventario; // <-- El modelo de inventario que maneja la lógica de movimientos y reportes
     private ProductoControl modeloControl; // <-- La fuente de la verdad lógica
 
     public InventarioController(InventarioGlobalView vista, ProductoControl modeloControl) {
         this.vista = vista;
+        this.inventario = new Inventario("Inventario Principal", modeloControl);
         this.modeloControl = modeloControl;
         
         cargarProductosPredeterminados();
@@ -67,6 +67,9 @@ public class InventarioController {
         // ==========================================
         // CASO DE USO 2: MOVIMIENTOS DE STOCK
         // ==========================================
+        // ==========================================
+        // CASO DE USO 2: MOVIMIENTOS DE STOCK
+        // ==========================================
         vista.getBtnNuevaTransaccion().setOnAction(e -> {
             Producto seleccionado = vista.getTabla().getSelectionModel().getSelectedItem();
             if (seleccionado == null) {
@@ -74,12 +77,9 @@ public class InventarioController {
                 return;
             }
 
-            // CASO DE PRUEBA 2: Buscar producto para asegurar trazabilidad antes de operar
-            Producto prodModelo = modeloControl.buscarProducto(seleccionado.getIdProducto());
-
             TextInputDialog dialog = new TextInputDialog("0");
             dialog.setTitle("Registrar Movimiento");
-            dialog.setHeaderText("Movimiento para: " + prodModelo.getNombre());
+            dialog.setHeaderText("Movimiento para: " + seleccionado.getNombre());
             dialog.setContentText("Ingrese cantidad (Positivo = Entrada, Negativo = Salida):");
 
             Optional<String> resultado = dialog.showAndWait();
@@ -88,18 +88,23 @@ public class InventarioController {
                     int cantidad = Integer.parseInt(resultado.get());
                     if (cantidad == 0) throw new InventarioException("La cantidad debe ser distinta de 0.");
 
+                    String idProd = seleccionado.getIdProducto();
+
                     if (cantidad > 0) {
-                        prodModelo.setStock(prodModelo.getStock() + cantidad);
-                        mostrarAlerta("Éxito", "Entrada Registrada", "Stock aumentado en el Modelo.", Alert.AlertType.INFORMATION);
+                        // USAMOS TU MODELO TRANSACCIONAL: Esto creará el DetalleMovimiento y lo guardará
+                        inventario.registrarEntrada(idProd, cantidad);
+                        mostrarAlerta("Éxito", "Entrada Registrada", "Movimiento guardado en la bitácora de Inventario.", Alert.AlertType.INFORMATION);
                     } else {
                         int salida = Math.abs(cantidad);
-                        if (prodModelo.getStock() < salida) {
-                            throw new StockInsuficienteException(prodModelo.getNombre(), prodModelo.getStock(), salida);
+                        if (seleccionado.getStock() < salida) {
+                            throw new StockInsuficienteException(seleccionado.getNombre(), seleccionado.getStock(), salida);
                         }
-                        prodModelo.setStock(prodModelo.getStock() - salida);
-                        mostrarAlerta("Éxito", "Salida Registrada", "Stock disminuido en el Modelo.", Alert.AlertType.INFORMATION);
+                        // USAMOS TU MODELO TRANSACCIONAL: Esto validará y guardará en la lista
+                        inventario.registrarSalida(idProd, salida);
+                        mostrarAlerta("Éxito", "Salida Registrada", "Movimiento guardado en la bitácora de Inventario.", Alert.AlertType.INFORMATION);
                     }
 
+                    // Sincronizamos los cambios del modelo con la pantalla
                     refrescarTablaDesdeModelo();
 
                 } catch (NumberFormatException ex) {
@@ -108,6 +113,56 @@ public class InventarioController {
                     mostrarAlerta("Error", "Operación Cancelada", ex.getMessage(), Alert.AlertType.ERROR);
                 }
             }
+        });
+
+        // ==========================================
+        // TU BOTÓN DE PRUEBA (Ahora sí va a funcionar)
+        // ==========================================
+        // ==========================================
+        // TU BOTÓN DE PRUEBA (Ahora en una Ventana Gráfica)
+        // ==========================================
+        vista.getBtnPruebaMov().setOnAction(e -> {
+            // 1. Obtenemos la lista real de movimientos
+            java.util.List<com.example.Model.MovimientoProducto> lista = inventario.verMovimientos();
+            
+            // 2. Construimos la cadena de texto para la ventana
+            StringBuilder sb = new StringBuilder();
+            sb.append("========================================\n");
+            sb.append("      AUDITORÍA DE MOVIMENTOS DE BODEGA \n");
+            sb.append("========================================\n\n");
+            
+            if (lista.isEmpty()) {
+                sb.append("[INFO] No hay movimientos registrados en esta sesión.");
+            } else {
+                sb.append("Total de transacciones: (").append(lista.size()).append(")\n\n");
+                for (com.example.Model.MovimientoProducto mp : lista) {
+                    sb.append("» Transacción: ").append(mp.getIdMovimiento()).append("\n");
+                    sb.append("  Fecha: ").append(mp.getFecha()).append("\n");
+                    
+                    for (com.example.Model.DetalleMovimiento dm : mp.detalle) {
+                        String accion = dm.getTipo().equalsIgnoreCase("ENTRADA") ? "[ENTRADA]" : "[SALIDA]";
+                        sb.append("  • ").append(accion).append(" ")
+                          .append(dm.getProducto().getNombre()).append(" x")
+                          .append(dm.getCantidadProductos()).append(" uds.\n");
+                    }
+                    sb.append("----------------------------------------------------------------------\n");
+                }
+            }
+            
+            // 3. Montamos un TextArea para que tenga barra de scroll si el historial es muy largo
+            TextArea textArea = new TextArea(sb.toString());
+            textArea.setEditable(false);
+            textArea.setWrapText(true);
+            textArea.setPrefWidth(500);
+            textArea.setPrefHeight(400);
+            textArea.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 13px;"); // Fuente tipo consola para que se vea ordenado
+
+            // 4. Desplegamos la alerta gráfica
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Bitácora de Auditoría");
+            alert.setHeaderText("Historial Transaccional de la Sesión");
+            alert.getDialogPane().setContent(textArea); // Inyectamos el cuadro de texto
+            alert.showAndWait();
         });
 
         // ==========================================

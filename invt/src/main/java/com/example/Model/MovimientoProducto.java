@@ -28,27 +28,30 @@ public class MovimientoProducto {
         double totalMonetario = 0;
 
         for (DetalleMovimiento dm : detalle) {
-            dm.calcularTotal(); 
-            
+            dm.calcularTotal(); // Imprime el subtotal en consola
             Producto prod = dm.getProducto();
             int cantidad = dm.getCantidadProductos();
             
-            
-            if (dm.getTipo() == "ENTRADA") {
-                prod.actualizarStock(prod.getStock() + cantidad);
-            } else if (dm.getTipo() == "SALIDA") {
+            // Lógica de afectación de Stock
+            if (dm.getTipo().equalsIgnoreCase("ENTRADA")) {
+                prod.setStock(prod.getStock() + cantidad);
+            } else if (dm.getTipo().equalsIgnoreCase("SALIDA")) {
                 if (prod.getStock() >= cantidad) {
-                    prod.actualizarStock(prod.getStock() - cantidad);
+                    prod.setStock(prod.getStock() - cantidad);
                 } else {
                     System.out.println("[ERROR] Stock insuficiente para descargar '" + prod.getNombre() + "'");
                 }
             }
             
-            totalMonetario += (cantidad * dm.getPrecio());
+            // Obtenemos el precio directamente desde el objeto Producto asociado
+            totalMonetario += (cantidad * prod.getPrecio());
         }
 
         System.out.println("--------------------------------------------------");
         System.out.println("Monto total procesado en la transacción: $" + totalMonetario);
         System.out.println("==================================================\n");
     }
+
+    public String getIdMovimiento() { return idMovimiento; }
+    public Date getFecha() { return fecha; }
 }

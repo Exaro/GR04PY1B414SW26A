@@ -1,0 +1,13 @@
+package Logica;
+
+public class DetalleMovimiento {
+    private String idDetalle;
+    private String tipo;
+    private int cantidadProductos;
+    private double precio;
+    private String marca;
+
+    public void calcularTotal() {
+        // Implementación
+    }
+}

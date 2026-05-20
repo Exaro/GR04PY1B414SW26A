@@ -68,12 +68,12 @@ public class InventarioGlobalView {
         filtroInput = new TextField();
         filtroInput.setPromptText("Buscar por nombre de prenda o marca...");
 
-        btnAgregarProducto = new Button("➕ Registrar Prenda");
-        btnNuevaTransaccion = new Button("🔄 Entrada/Salida Modificar Stock");
-        btnGenerarReporteEscrito = new Button("📝 Reporte de Tienda");
-        btnEliminarProducto = new Button("❌ Dar de Baja Prenda");
+        btnAgregarProducto = new Button("Agregar Producto");
+        btnNuevaTransaccion = new Button("Movimiento Producto");
+        btnGenerarReporteEscrito = new Button("Reporte de Tienda");
+        btnEliminarProducto = new Button("Dar de Baja Prenda");
         btnPrueba = new Button("Prueba");
-        btnPruebaMov = new Button("Prueba Movimientos");
+        btnPruebaMov = new Button("Historial Movimientos");
 
         btnAgregarProducto.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;");
         btnNuevaTransaccion.setStyle("-fx-background-color: #e67e22; -fx-text-fill: white; -fx-font-weight: bold;");
@@ -102,7 +102,7 @@ public class InventarioGlobalView {
             productosFiltrados.setPredicate(p -> {
                 if (nuevo == null || nuevo.isEmpty()) return true;
                 String lower = nuevo.toLowerCase();
-                return p.getNombre().toLowerCase().contains(lower) || p.getMarca().toLowerCase().contains(lower);
+                return p.getIdProducto().toLowerCase().contains(lower) || p.getMarca().toLowerCase().contains(lower);
             });
         });
 

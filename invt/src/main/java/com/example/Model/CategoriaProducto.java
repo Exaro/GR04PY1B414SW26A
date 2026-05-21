@@ -14,11 +14,17 @@ public class CategoriaProducto {
         this.descripcion = descripcion;
     }
 
+    public CategoriaProducto(String tipo) {
+        this.tipo = tipo;
+        this.descripcion = "";
+        this.idCategoria = "";
+    }
+
     public List<Producto> obtenerProducto(ProductoControl control) {
         List<Producto> productosDeEstaCategoria = new ArrayList<>();
         
         for (Producto p : control.listarProductos()) {
-            if (p.obtenerCategoria() != null && p.obtenerCategoria().getIdCategoria().equals(this.idCategoria)) {
+            if (p.obtenerCategoria() != null && p.obtenerCategoria().equals(this.idCategoria)) {
                 productosDeEstaCategoria.add(p);
             }
         }

@@ -18,9 +18,7 @@ public class DetalleMovimiento {
         this.producto = producto;
     }
 
-   public double calcularTotal() {
-    return this.cantidadProductos * producto.getPrecio();
-}
+   
     public String getIdDetalle() { return idDetalle; }
     public void setIdDetalle(String idDetalle) { this.idDetalle = idDetalle; }
 
@@ -38,4 +36,8 @@ public class DetalleMovimiento {
 
     public Producto getProducto() { return producto; }
     public void setProducto(Producto producto) { this.producto = producto; }
+
+    public double calcularTotal() {
+        return this.cantidadProductos * producto.getPrecio();
+    }
 }

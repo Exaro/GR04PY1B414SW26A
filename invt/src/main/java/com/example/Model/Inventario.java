@@ -36,15 +36,8 @@ public class Inventario {
         return producto.buscarProducto(id);
     }
 
-    public List<Producto> listarProductos() {
-        return producto.listarProductos();
-    }   
 
-    public List<Reporte> reportesGenerados() {
-        return this.reportesGenerados;
-    }
-
-   public void registrarReporte(Reporte reporte, Producto producto) {
+   public void generarReporte(Reporte reporte, Producto producto) {
         reportesGenerados.add(reporte);
         this.fechaActualizacion = new Date();
     }

@@ -11,6 +11,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -27,7 +28,6 @@ public class InventarioGlobalView {
     private Button btnNuevaTransaccion;
     private Button btnGenerarReporteEscrito;
     private Button btnEliminarProducto;
-    private Button btnPrueba;
     private Button btnPruebaMov;
     private Button btnHistorialProductos;
     private Button btnHistorialReportes;
@@ -63,7 +63,14 @@ public class InventarioGlobalView {
         TableColumn<Producto, Number> colStock = new TableColumn<>("Stock");
         colStock.setCellValueFactory(data -> new SimpleIntegerProperty(data.getValue().getStock()));
 
-        tabla.getColumns().addAll(colId, colNombre, colMarca, colTalla, colColor, colPrecio, colStock);
+        TableColumn<Producto, String> colCategoria = new TableColumn<>("Categoría");
+        colCategoria.setCellValueFactory(cellData ->
+            new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue()
+                        .getCategoria()
+                        .getTipo()
+            )
+        );        tabla.getColumns().addAll(colId, colNombre, colMarca, colTalla, colColor, colPrecio, colStock, colCategoria);
         tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // COMPONENTES
@@ -74,7 +81,6 @@ public class InventarioGlobalView {
         btnNuevaTransaccion = new Button("Movimiento Producto");
         btnGenerarReporteEscrito = new Button("Generar Reporte");
         btnEliminarProducto = new Button("Eliminar Producto");
-        btnPrueba = new Button("Prueba");
         btnPruebaMov = new Button("Ver Movimientos");
         btnHistorialProductos = new Button("Historial de Productos");
         btnHistorialReportes = new Button("Historial de Reportes");
@@ -83,7 +89,6 @@ public class InventarioGlobalView {
         btnNuevaTransaccion.setStyle("-fx-background-color: #e67e22; -fx-text-fill: white; -fx-font-weight: bold;");
         btnGenerarReporteEscrito.setStyle("-fx-background-color: #3498db; -fx-text-fill: white;");
         btnEliminarProducto.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white;");
-        btnPrueba.setStyle("-fx-background-color: #9b59b6; -fx-text-fill: white;");
         btnPruebaMov.setStyle("-fx-background-color: #16a085; -fx-text-fill: white;");
         btnHistorialProductos.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
 
@@ -95,7 +100,7 @@ public class InventarioGlobalView {
         // LAYOUTS
         HBox topBar = new HBox(15, new Label("Filtrar:"), filtroInput);
         topBar.setPadding(new Insets(5, 0, 5, 0));
-        HBox barraBotones = new HBox(10, btnAgregarProducto,btnEliminarProducto,btnHistorialProductos, btnNuevaTransaccion,btnPruebaMov, btnGenerarReporteEscrito,  btnHistorialReportes, btnPrueba);
+        HBox barraBotones = new HBox(10, btnAgregarProducto,btnEliminarProducto,btnHistorialProductos, btnNuevaTransaccion,btnPruebaMov, btnGenerarReporteEscrito,  btnHistorialReportes);
         VBox infoPanel = new VBox(8, totalPrendasLabel, valorBodegaLabel, alertaStockLabel);
         infoPanel.setPadding(new Insets(10));
         infoPanel.setStyle("-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 5;");
@@ -138,7 +143,6 @@ public class InventarioGlobalView {
     public Button getBtnNuevaTransaccion() { return btnNuevaTransaccion; }
     public Button getBtnGenerarReporteEscrito() { return btnGenerarReporteEscrito; }
     public Button getBtnEliminarProducto() { return btnEliminarProducto; }
-    public Button getBtnPrueba() { return btnPrueba; }
     public Button getBtnPruebaMov() { return btnPruebaMov; }
     public Button getBtnHistorialProductos() { return btnHistorialProductos; }  
     public Button getBtnHistorialReportes() { return btnHistorialReportes; }

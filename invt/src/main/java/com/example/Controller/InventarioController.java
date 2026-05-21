@@ -25,10 +25,8 @@ public class InventarioController {
     }
 
     private void cargarProductosPredeterminados() {
-        // CASO DE PRUEBA 1: Insertar a través del método nativo del modelo
-        modeloControl.agregarProducto(new Producto("P001", "Camiseta", "Algodón liviano", "M", "Negro", 15.0, 20, true, "Nike"));
-        modeloControl.agregarProducto(new Producto("P002", "Jeans Slim Fit", "Mezclilla elástica", "32", "Azul", 59.99, 3, true, "Levi's"));
-    }
+
+        modeloControl.listarProductos();    }
 
     private void refrescarTablaDesdeModelo() {
         // Sincroniza la lista visual de la UI con la lista interna de ProductoControl
@@ -112,6 +110,9 @@ inventario.historiales.add(new Historial("HIST-" + (inventario.historiales.size(
             }
         });
 
+
+
+        
         // ==========================================
         // TU BOTÓN DE PRUEBA 
         // ==========================================
@@ -293,9 +294,6 @@ inventario.historiales.add(new Historial("HIST-" + (inventario.historiales.size(
     }
 });
 
-        vista.getBtnPrueba().setOnAction(e -> {
-            modeloControl.listarProductos();
-        });
         vista.getBtnHistorialProductos().setOnAction(e -> {
 
     StringBuilder sb = new StringBuilder();
@@ -470,7 +468,9 @@ inventario.historiales.add(new Historial("HIST-" + (inventario.historiales.size(
         TextField txtPrecio = new TextField(); txtPrecio.setPromptText("Ej: 15");
         TextField txtStock = new TextField(); txtStock.setPromptText("Ej: 20");
         TextField txtMarca = new TextField(); txtMarca.setPromptText("Ej: Nike");
-
+        TextField txtCategoria = new TextField();
+        
+        txtCategoria.setPromptText("Ej: Hombre");
         grid.add(new Label("ID Producto:"), 0, 0);   grid.add(txtId, 1, 0);
         grid.add(new Label("Prenda:"), 0, 1);         grid.add(txtNombre, 1, 1);
         grid.add(new Label("Descripción:"), 0, 2);   grid.add(txtDescripcion, 1, 2);
@@ -479,26 +479,52 @@ inventario.historiales.add(new Historial("HIST-" + (inventario.historiales.size(
         grid.add(new Label("Precio ($):"), 0, 5);    grid.add(txtPrecio, 1, 5);
         grid.add(new Label("Stock Inicial:"), 0, 6);  grid.add(txtStock, 1, 6);
         grid.add(new Label("Marca:"), 0, 7);          grid.add(txtMarca, 1, 7);
-
+        grid.add(new Label("Categoría:"), 0, 8);
+        grid.add(txtCategoria, 1, 8);
         dialog.getDialogPane().setContent(grid);
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == btnGuardarTipo) {
                 try {
                     String idIngresado = txtId.getText().trim();
-
-                    // CONDICIÓN CASO 1: No existe otro producto con el mismo ID en el modelo
                     if (modeloControl.buscarProducto(idIngresado) != null) {
                         throw new IdDuplicadoException(idIngresado);
                     }
+                    String tipoCategoria =
+                        txtCategoria.getText().trim().toLowerCase();
+
+                    if (
+                        !tipoCategoria.equals("hombre") &&
+                        !tipoCategoria.equals("mujer") &&
+                        !tipoCategoria.equals("niño") &&
+                        !tipoCategoria.equals("niña")
+                    ) {
+                        throw new Exception(
+                            "La categoría debe ser: hombre, mujer, niño o niña."
+                        );
+                    }
+
+                    CategoriaProducto categoria = new CategoriaProducto(tipoCategoria);
 
                     return new Producto(
-                        idIngresado, txtNombre.getText(), txtDescripcion.getText(),
-                        txtTalla.getText(), txtColor.getText(), Double.parseDouble(txtPrecio.getText()),
-                        Integer.parseInt(txtStock.getText()), true, txtMarca.getText()
+                        idIngresado,
+                        txtNombre.getText().trim(),
+                        txtDescripcion.getText().trim(),
+                        txtTalla.getText().trim(),
+                        txtColor.getText().trim(),
+                        Double.parseDouble(txtPrecio.getText().trim()),
+                        Integer.parseInt(txtStock.getText().trim()),
+                        true,
+                        txtMarca.getText().trim(),
+                        categoria
                     );
                 } catch (Exception ex) {
-                    mostrarAlerta("Error de Validación", "No se pudo guardar", ex.getMessage(), Alert.AlertType.ERROR);
+                    mostrarAlerta(
+                        "Error de Validación",
+                        "No se pudo guardar",
+                        ex.getMessage(),
+                        Alert.AlertType.ERROR
+                    );
                     return null;
                 }
             }

@@ -14,6 +14,10 @@ public class MovimientoProducto {
         this.fecha = new Date(); 
     }
 
+    public String getIdMovimiento() { return idMovimiento; }
+    public Date getFecha() { return fecha; }
+
+
     public void agregarDetalle(DetalleMovimiento dm) {
         if (dm != null) {
             this.detalle.add(dm);
@@ -48,6 +52,4 @@ public class MovimientoProducto {
         System.out.println("==================================================\n");
     }
 
-    public String getIdMovimiento() { return idMovimiento; }
-    public Date getFecha() { return fecha; }
 }

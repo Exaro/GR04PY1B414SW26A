@@ -16,7 +16,7 @@ public class Producto {
     public ProductoControl control;
 
     public Producto(String idProducto, String nombre, String descripcionProducto, String talla, String color,
-                    double precio, int stock, boolean estado, String marca) {
+                    double precio, int stock, boolean estado, String marca, CategoriaProducto categoria) {
         this.idProducto = idProducto;
         this.nombre = nombre;
         this.descripcion = descripcionProducto;
@@ -26,6 +26,7 @@ public class Producto {
         this.stock = stock;
         this.estado = estado;
         this.marca = marca;
+        this.categoria = categoria;
     }
 
 
@@ -85,6 +86,11 @@ public class Producto {
         return marca;
     }
 
+    public CategoriaProducto getCategoria() {
+        return categoria;
+    }
+
+
     public void actualizarPrecio(double nuevoPrecio){
         if(nuevoPrecio >= 0){
             this.precio = nuevoPrecio;
@@ -110,9 +116,9 @@ public class Producto {
             System.out.println("El producto " + this.nombre + " no está disponible.");
         }
     }
-    
-    public CategoriaProducto obtenerCategoria() {
-        return this.categoria;
+
+    public String obtenerCategoria() {
+        return this.categoria.getTipo();
     }
 
     public void alertaStock() {

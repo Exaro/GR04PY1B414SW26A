@@ -72,10 +72,10 @@ public class InventarioGlobalView {
 
         btnAgregarProducto = new Button("Agregar Producto");
         btnNuevaTransaccion = new Button("Movimiento Producto");
-        btnGenerarReporteEscrito = new Button("Reporte de Tienda");
-        btnEliminarProducto = new Button("Dar de Baja Prenda");
+        btnGenerarReporteEscrito = new Button("Generar Reporte");
+        btnEliminarProducto = new Button("Eliminar Producto");
         btnPrueba = new Button("Prueba");
-        btnPruebaMov = new Button("Historial Movimientos");
+        btnPruebaMov = new Button("Ver Movimientos");
         btnHistorialProductos = new Button("Historial de Productos");
         btnHistorialReportes = new Button("Historial de Reportes");
 

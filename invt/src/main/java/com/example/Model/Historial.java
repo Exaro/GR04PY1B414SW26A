@@ -26,4 +26,10 @@ public class Historial {
         System.out.println("Stock nuevo: " + stockNuevo);
         System.out.println("-----------------------------------");
     }
+
+    public String getIdHistorial() { return idHistorial; }
+    public Date getFecha() { return fecha; }                        
+    public String getDescripcion() { return descripcion; }
+    public int getStockViejo() { return stockViejo; }
+    public int getStockNuevo() { return stockNuevo; }
 }

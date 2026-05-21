@@ -59,8 +59,7 @@ public class InventarioController {
             
             // CASO DE PRUEBA 3: Se ejecuta eliminarProducto(id) en ProductoControl
             modeloControl.eliminarProducto(seleccionado.getIdProducto());
-           inventario.historiales.add("[" + new Date() + "] SE ELIMINÓ -> " + seleccionado.getNombre());
-            // Se actualiza la interfaz
+inventario.historiales.add(new Historial("HIST-" + (inventario.historiales.size() + 1),new Date(),  "SE ELIMINÓ -> " + seleccionado.getNombre(), seleccionado.getStock(), 0));            // Se actualiza la interfaz
             refrescarTablaDesdeModelo();
             mostrarAlerta("Éxito", "Producto Eliminado", "Producto eliminado de la lista de ProductoControl.", Alert.AlertType.INFORMATION);
         });
@@ -309,7 +308,6 @@ public class InventarioController {
         vista.getBtnPrueba().setOnAction(e -> {
             modeloControl.listarProductos();
         });
-
         vista.getBtnHistorialProductos().setOnAction(e -> {
 
     StringBuilder sb = new StringBuilder();
@@ -322,7 +320,33 @@ public class InventarioController {
 
         sb.append("No existen registros.");
 
-    } 
+    } else {
+
+        for (Historial h : inventario.historiales) {
+
+            sb.append("ID: ")
+              .append(h.getIdHistorial())
+              .append("\n");
+
+            sb.append("Fecha: ")
+              .append(h.getFecha())
+              .append("\n");
+
+            sb.append("Descripción: ")
+              .append(h.getDescripcion())
+              .append("\n");
+
+            sb.append("Stock Viejo: ")
+              .append(h.getStockViejo())
+              .append("\n");
+
+            sb.append("Stock Nuevo: ")
+              .append(h.getStockNuevo())
+              .append("\n");
+
+            sb.append("----------------------------------\n\n");
+        }
+    }
 
     TextArea area = new TextArea(sb.toString());
 
@@ -345,8 +369,9 @@ public class InventarioController {
     alert.getDialogPane().setContent(area);
 
     alert.showAndWait();
-        });
-        
+
+});
+    
        vista.getBtnHistorialReportes().setOnAction(e -> {
 
     Producto seleccionado = vista.getTabla().getSelectionModel().getSelectedItem();
@@ -496,11 +521,7 @@ public class InventarioController {
         resultado.ifPresent(nuevoProducto -> {
             // PROCEDIMIENTO CASO 1: Se llama al método agregarProducto(p) de ProductoControl
             modeloControl.agregarProducto(nuevoProducto);
-             inventario.historiales.add(
-                    "[" + new Date() + "] "
-                    + "SE AGREGÓ -> "
-                    + nuevoProducto.getNombre()
-                );
+          inventario.historiales.add(new Historial( "HIST-" + (inventario.historiales.size() + 1), new Date(),"SE AGREGÓ -> " + nuevoProducto.getNombre(),0,nuevoProducto.getStock()));
             // El sistema actualiza la pantalla
             refrescarTablaDesdeModelo();
         });

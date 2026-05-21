@@ -31,6 +31,7 @@ public class InventarioGlobalView {
     private Button btnPruebaMov;
     private Button btnHistorialProductos;
     private Button btnHistorialReportes;
+private Button btnCambiosProducto;
 
     private ObservableList<Producto> productos;
     private FilteredList<Producto> productosFiltrados;
@@ -84,6 +85,7 @@ public class InventarioGlobalView {
         btnPruebaMov = new Button("Ver Movimientos");
         btnHistorialProductos = new Button("Historial de Productos");
         btnHistorialReportes = new Button("Historial de Reportes");
+        btnCambiosProducto = new Button("Cambios Producto");
 
         btnAgregarProducto.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;");
         btnNuevaTransaccion.setStyle("-fx-background-color: #e67e22; -fx-text-fill: white; -fx-font-weight: bold;");
@@ -91,7 +93,8 @@ public class InventarioGlobalView {
         btnEliminarProducto.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white;");
         btnPruebaMov.setStyle("-fx-background-color: #16a085; -fx-text-fill: white;");
         btnHistorialProductos.setStyle("-fx-background-color: #2c3e50; -fx-text-fill: white;");
-
+        btnCambiosProducto.setStyle("-fx-background-color: #85ad44; -fx-text-fill: white; -fx-font-weight: bold;");
+        btnHistorialReportes.setStyle("-fx-background-color: #8e44ad; -fx-text-fill: white; -fx-font-weight: bold;");
         totalPrendasLabel = new Label();
         valorBodegaLabel = new Label();
         alertaStockLabel = new Label();
@@ -100,7 +103,7 @@ public class InventarioGlobalView {
         // LAYOUTS
         HBox topBar = new HBox(15, new Label("Filtrar:"), filtroInput);
         topBar.setPadding(new Insets(5, 0, 5, 0));
-        HBox barraBotones = new HBox(10, btnAgregarProducto,btnEliminarProducto,btnHistorialProductos, btnNuevaTransaccion,btnPruebaMov, btnGenerarReporteEscrito,  btnHistorialReportes);
+        HBox barraBotones = new HBox(10, btnAgregarProducto,btnEliminarProducto,btnHistorialProductos, btnNuevaTransaccion,btnPruebaMov, btnGenerarReporteEscrito,  btnHistorialReportes, btnCambiosProducto);
         VBox infoPanel = new VBox(8, totalPrendasLabel, valorBodegaLabel, alertaStockLabel);
         infoPanel.setPadding(new Insets(10));
         infoPanel.setStyle("-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 5;");
@@ -146,4 +149,7 @@ public class InventarioGlobalView {
     public Button getBtnPruebaMov() { return btnPruebaMov; }
     public Button getBtnHistorialProductos() { return btnHistorialProductos; }  
     public Button getBtnHistorialReportes() { return btnHistorialReportes; }
+    public Button getBtnCambiosProducto() {
+    return btnCambiosProducto;
+}
 }

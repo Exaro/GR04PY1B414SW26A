@@ -447,7 +447,73 @@ inventario.historiales.add(new Historial("HIST-" + (inventario.historiales.size(
 
     alert.showAndWait();
 });
-    }
+   
+    vista.getBtnCambiosProducto().setOnAction(e -> {
+
+        Producto seleccionado =
+            vista.getTabla().getSelectionModel().getSelectedItem();
+
+        if (seleccionado == null) {
+
+            mostrarAlerta(
+                "Atención",
+                "Producto no seleccionado",
+                "Seleccione un producto.",
+                Alert.AlertType.WARNING
+            );
+
+            return;
+        }
+
+        TextInputDialog dialog =
+            new TextInputDialog(
+                String.valueOf(seleccionado.getPrecio())
+            );
+
+        dialog.setTitle("Actualizar Precio");
+
+        dialog.setHeaderText(
+            "Producto: " + seleccionado.getNombre()
+        );
+
+        dialog.setContentText(
+            "Nuevo precio:"
+        );
+
+        Optional<String> resultado =
+            dialog.showAndWait();
+
+        if (resultado.isPresent()) {
+
+            try {
+
+                double nuevoPrecio =
+                    Double.parseDouble(resultado.get());
+
+                seleccionado.actualizarPrecio(nuevoPrecio);
+
+                refrescarTablaDesdeModelo();
+
+                mostrarAlerta(
+                    "Éxito",
+                    "Precio actualizado",
+                    "El precio fue modificado correctamente.",
+                    Alert.AlertType.INFORMATION
+                );
+
+            } catch (Exception ex) {
+
+                mostrarAlerta(
+                    "Error",
+                    "Precio inválido",
+                    ex.getMessage(),
+                    Alert.AlertType.ERROR
+                );
+            }
+        }
+    });
+
+}
 
 
     private void abrirDialogoAgregarProducto() {

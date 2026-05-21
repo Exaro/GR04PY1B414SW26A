@@ -116,94 +116,82 @@ inventario.historiales.add(new Historial("HIST-" + (inventario.historiales.size(
         // TU BOTÓN DE PRUEBA 
         // ==========================================
         vista.getBtnPruebaMov().setOnAction(e -> {
-           Producto seleccionado = vista.getTabla()
-        .getSelectionModel()
-        .getSelectedItem();
+           Producto seleccionado = vista.getTabla().getSelectionModel().getSelectedItem();
 
-    if (seleccionado == null) {
-
-        mostrarAlerta(
-            "Atención",
-            "Producto no seleccionado",
-            "Seleccione un producto.",
-            Alert.AlertType.WARNING
-        );
-
-        return;
-    }
-
-    StringBuilder sb = new StringBuilder();
-
-    sb.append("========================================\n");
-    sb.append("   HISTORIAL MOVIMIENTOS PRODUCTO\n");
-    sb.append("========================================\n\n");
-
-    sb.append("Producto: ")
-      .append(seleccionado.getNombre())
-      .append("\n\n");
-
-    boolean encontrado = false;
-
-    for (MovimientoProducto mp : inventario.movimientos) {
-
-        for (DetalleMovimiento dm : mp.detalle) {
-
-            if (dm.getProducto()
-                  .getIdProducto()
-                  .equals(seleccionado.getIdProducto())) {
-
-                encontrado = true;
-
-                sb.append("Transacción: ")
-                  .append(mp.getIdMovimiento())
-                  .append("\n");
-
-                sb.append("Fecha: ")
-                  .append(mp.getFecha())
-                  .append("\n");
-
-                sb.append("Tipo: ")
-                  .append(dm.getTipo())
-                  .append("\n");
-
-                sb.append("Cantidad: ")
-                  .append(dm.getCantidadProductos())
-                  .append("\n");
-
-                sb.append("-----------------------------------\n");
-            }
+        if (seleccionado == null) {
+            mostrarAlerta("Atención","Producto no seleccionado","Seleccione un producto.", Alert.AlertType.WARNING);
+            return;
         }
-    }
 
-    if (!encontrado) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("========================================\n");
+        sb.append("   HISTORIAL MOVIMIENTOS PRODUCTO\n");
+        sb.append("========================================\n\n");
+        sb.append("Producto: ").append(seleccionado.getNombre()).append("\n\n");
 
-        sb.append("No existen movimientos para este producto.");
-    }
 
-    TextArea area = new TextArea(sb.toString());
+        for (MovimientoProducto mp : inventario.movimientos) {
+            for (DetalleMovimiento dm : mp.detalle) {
 
-    area.setEditable(false);
-    area.setWrapText(true);
+            double total = dm.calcularTotal();
 
-    area.setPrefWidth(600);
-    area.setPrefHeight(450);
+            sb.append("ID Detalle: ")
+            .append(dm.getIdDetalle())
+            .append("\n");
 
-    area.setStyle(
-        "-fx-font-family: 'Courier New';" +
-        "-fx-font-size: 13px;"
-    );
+            sb.append("Tipo Movimiento: ")
+            .append(dm.getTipo())
+            .append("\n");
 
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            sb.append("Producto: ")
+            .append(dm.getProducto().getNombre())
+            .append("\n");
 
-    alert.setTitle("Historial Movimientos");
+            sb.append("Marca: ")
+            .append(dm.getProducto().getMarca())
+            .append("\n");
 
-    alert.setHeaderText(
-        "Movimientos del producto seleccionado"
-    );
+            sb.append("Cantidad: ")
+            .append(dm.getCantidadProductos())
+            .append("\n");
 
-    alert.getDialogPane().setContent(area);
+            sb.append("Precio Unitario: $")
+            .append(dm.getPrecio())
+            .append("\n");
 
-    alert.showAndWait();
+            sb.append("Total Movimiento: $")
+            .append(total)
+            .append("\n");
+
+            sb.append("--------------------------------------\n");
+}
+        }
+
+
+            TextArea area = new TextArea(sb.toString());
+
+            area.setEditable(false);
+            area.setWrapText(true);
+
+            area.setPrefWidth(600);
+            area.setPrefHeight(450);
+
+            area.setStyle(
+                "-fx-font-family: 'Courier New';" +
+                "-fx-font-size: 13px;"
+            );
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+            alert.setTitle("Historial Movimientos");
+
+            alert.setHeaderText(
+                "Movimientos del producto seleccionado"
+            );
+
+            alert.getDialogPane().setContent(area);
+
+            alert.showAndWait();
         });
 
         // ==========================================

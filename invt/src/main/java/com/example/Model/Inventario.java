@@ -56,7 +56,7 @@ public class Inventario {
             MovimientoProducto mov = new MovimientoProducto("MOV-IN-" + (movimientos.size() + 1));
             
             // Constructor limpio sin precio ni marca quemados
-            DetalleMovimiento dm = new DetalleMovimiento("DET-" + (mov.detalle.size() + 1), "ENTRADA", cantidad, p);
+            DetalleMovimiento dm = new DetalleMovimiento("DET-" + (mov.detalle.size() + 1), "ENTRADA", cantidad,p.getMarca(), p.getPrecio(),  p);
             mov.agregarDetalle(dm);
             
             mov.registrarMovimientoP();
@@ -73,7 +73,7 @@ public class Inventario {
         if (p != null && cantidad > 0) {
             if (p.getStock() >= cantidad) {
                 MovimientoProducto mov = new MovimientoProducto("MOV-OUT-" + (movimientos.size() + 1));
-                DetalleMovimiento dm = new DetalleMovimiento("DET-" + (mov.detalle.size() + 1), "SALIDA", cantidad, p);
+                DetalleMovimiento dm = new DetalleMovimiento("DET-" + (mov.detalle.size() + 1), "SALIDA", cantidad, p.getMarca(), p.getPrecio(), p);
                 mov.agregarDetalle(dm);
                 
                 mov.registrarMovimientoP();

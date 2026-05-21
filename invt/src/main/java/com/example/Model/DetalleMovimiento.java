@@ -5,23 +5,22 @@ public class DetalleMovimiento {
     private String tipo; // ENTRADA o SALIDA
     private int cantidadProductos;
     private String marca; 
+    private double precio;
 
     public Producto producto; 
 
-    public DetalleMovimiento(String idDetalle, String tipo, int cantidadProductos,  Producto producto) {
+    public DetalleMovimiento(String idDetalle, String tipo, int cantidadProductos, String marca, double precio, Producto producto) {
         this.idDetalle = idDetalle;
         this.tipo = tipo;
         this.cantidadProductos = cantidadProductos;
+        this.marca = marca;
+        this.precio = precio;
         this.producto = producto;
     }
 
-    public void calcularTotal() {
-        double totalLineal = this.cantidadProductos * producto.getPrecio();
-        String accion = (tipo.equalsIgnoreCase("ENTRADA")) ? "[ENTRADA]" : "[SALIDA]";
-        
-        System.out.println(accion + " " + producto.getNombre() + " (" + producto.getMarca() + ") x" + cantidadProductos + " uds. Subtotal: $" + totalLineal);
-    }
-
+   public double calcularTotal() {
+    return this.cantidadProductos * producto.getPrecio();
+}
     public String getIdDetalle() { return idDetalle; }
     public void setIdDetalle(String idDetalle) { this.idDetalle = idDetalle; }
 
@@ -33,6 +32,9 @@ public class DetalleMovimiento {
 
     public String getMarca() { return marca; }
     public void setMarca(String marca) { this.marca = marca; }
+
+    public double getPrecio() { return precio; }
+    public void setPrecio(double precio) { this.precio = precio; }  
 
     public Producto getProducto() { return producto; }
     public void setProducto(Producto producto) { this.producto = producto; }

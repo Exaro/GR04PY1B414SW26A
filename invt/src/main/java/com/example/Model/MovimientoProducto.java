@@ -24,15 +24,12 @@ public class MovimientoProducto {
         System.out.println("\n========== PROCESANDO TRANSACCIÓN DE BODEGA ==========");
         System.out.println("ID Transacción: " + idMovimiento + " | Fecha: " + fecha);
         System.out.println("--------------------------------------------------");
-        
         double totalMonetario = 0;
-
         for (DetalleMovimiento dm : detalle) {
-            dm.calcularTotal(); // Imprime el subtotal en consola
+            dm.calcularTotal(); 
             Producto prod = dm.getProducto();
             int cantidad = dm.getCantidadProductos();
             
-            // Lógica de afectación de Stock
             if (dm.getTipo().equalsIgnoreCase("ENTRADA")) {
                 prod.setStock(prod.getStock() + cantidad);
             } else if (dm.getTipo().equalsIgnoreCase("SALIDA")) {
@@ -43,7 +40,6 @@ public class MovimientoProducto {
                 }
             }
             
-            // Obtenemos el precio directamente desde el objeto Producto asociado
             totalMonetario += (cantidad * prod.getPrecio());
         }
 

@@ -11,20 +11,47 @@ public class Inventario {
     
     public List<MovimientoProducto> movimientos;
     public List<Reporte> reportesGenerados;
-    public List<Historial> historialTransacciones;
-    private ProductoControl controlProductos; 
+    public List<Historial> historiales;
+    public ProductoControl producto;
+    public Encargado encargado;
 
-    public Inventario(String descripcion, ProductoControl controlProductos) {
+    public Inventario(String descripcion, ProductoControl producto) {
         this.fechaActualizacion = new Date();
         this.descripcion = descripcion;
-        this.controlProductos = controlProductos;
+        this.producto = producto;
         this.movimientos = new ArrayList<>();
         this.reportesGenerados = new ArrayList<>();
-        this.historialTransacciones = new ArrayList<>();
+        this.historiales = new ArrayList<>();
     }
 
+    public Date getFechaActualizacion() {
+        return fechaActualizacion;
+    }   
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public Producto buscarProducto(String id) {
+        return producto.buscarProducto(id);
+    }
+
+    public List<Producto> listarProductos() {
+        return producto.listarProductos();
+    }   
+
+    public List<Reporte> reportesGenerados() {
+        return this.reportesGenerados;
+    }
+
+   public void registrarReporte(Reporte reporte, Producto producto) {
+        reportesGenerados.add(reporte);
+        this.fechaActualizacion = new Date();
+    }
+
+    
     public void registrarEntrada(String id, int cantidad) {
-        Producto p = controlProductos.buscarProducto(id);
+        Producto p = producto.buscarProducto(id);
         if (p != null && cantidad > 0) {
             MovimientoProducto mov = new MovimientoProducto("MOV-IN-" + (movimientos.size() + 1));
             
@@ -42,7 +69,7 @@ public class Inventario {
     }
 
     public void registrarSalida(String id, int cantidad) {
-        Producto p = controlProductos.buscarProducto(id);
+        Producto p = producto.buscarProducto(id);
         if (p != null && cantidad > 0) {
             if (p.getStock() >= cantidad) {
                 MovimientoProducto mov = new MovimientoProducto("MOV-OUT-" + (movimientos.size() + 1));
@@ -65,7 +92,7 @@ public class Inventario {
         System.out.println("\n==================================================");
         System.out.println("          SISTEMA DE AUDITORÍA: BODEGA            ");
         System.out.println("==================================================");
-        
+    
         if (this.movimientos.isEmpty()) {
             System.out.println("[INFO] No se han registrado movimientos en esta sesión.");
         } else {
@@ -74,7 +101,6 @@ public class Inventario {
             for (MovimientoProducto mp : movimientos) {
                 System.out.println("» Transacción: " + mp.getIdMovimiento() + " | Fecha: " + mp.getFecha());
                 
-                // Recorremos los detalles de este movimiento específico
                 for (DetalleMovimiento dm : mp.detalle) {
                     String accion = dm.getTipo().equalsIgnoreCase("ENTRADA") ? "[ENTRADA]" : "[SALIDA]";
                     System.out.println("  • " + accion + " " + dm.getProducto().getNombre() + 
@@ -84,8 +110,6 @@ public class Inventario {
             }
         }
         System.out.println("==================================================\n");
-        
-        // Seguimos retornando la lista por si el controlador la necesita para una tabla gráfica
         return this.movimientos;
     }
 }

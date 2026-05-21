@@ -27,6 +27,9 @@ public class Producto {
         this.estado = estado;
         this.marca = marca;
     }
+
+
+    
     public String getIdProducto() {
         return idProducto;
     }
@@ -99,6 +102,7 @@ public class Producto {
             System.out.println("Error: insuficiente stock para realizar esta operación.");
         }
     }
+
     public void verificarDisponibilidad(){
         if(this.stock > 0){
             System.out.println("El producto " + this.nombre + " está disponible.");
@@ -106,6 +110,7 @@ public class Producto {
             System.out.println("El producto " + this.nombre + " no está disponible.");
         }
     }
+    
     public CategoriaProducto obtenerCategoria() {
         return this.categoria;
     }

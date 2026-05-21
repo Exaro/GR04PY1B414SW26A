@@ -1,7 +1,6 @@
 package com.example.Model;
 
 import java.util.Date;
-import java.util.Scanner;
 
 public class Reporte {
     private String idReporte;
@@ -19,35 +18,23 @@ public class Reporte {
     }
 
     public void generarReporte() {
-        System.out.println("\n=================================================================");
-        System.out.println("                 SISTEMA DE REPORTES - TIENDA DE ROPA            ");
-        System.out.println("=================================================================");
-        System.out.println("CÓDIGO REPORTE : " + idReporte);
-        System.out.println("ASUNTO         : " + tipoReporte);
-        System.out.println("PERIODO ALUDIDO: Desde " + fechaIni + " hasta " + fechaFin);
-        System.out.println("-----------------------------------------------------------------");
-        System.out.println("[SISTEMA] Datos de existencias procesados correctamente.");
-        System.out.println("-----------------------------------------------------------------");
-        
-        // CORRECCIÓN: No usamos try-with-resources aquí para no romper el System.in global
-        Scanner teclado = new Scanner(System.in);
-        System.out.println("\n[ENCARGADO] Escriba a continuación las observaciones o novedades de la tienda:");
-        System.out.println("(Presione ENTRAR para finalizar su párrafo)\n");
-        System.out.print("> ");
-        
-        this.descripcion = teclado.nextLine();
-        
-        System.out.println("\n[SISTEMA] ¡Párrafo del encargado acoplado con éxito al reporte escrito!");
-        System.out.println("=================================================================\n");
+
+        System.out.println("\n=================================================");
+        System.out.println("         SISTEMA DE REPORTES - INVENTARIO");
+        System.out.println("=================================================");
+        System.out.println("ID REPORTE   : " + idReporte);
+        System.out.println("TIPO         : " + tipoReporte);
+        System.out.println("FECHA INICIO : " + fechaIni);
+        System.out.println("FECHA FIN    : " + fechaFin);
+        System.out.println("DESCRIPCIÓN  : " + descripcion);
+        System.out.println("=================================================\n");
     }
 
-    public void exportarReporte() {
-        System.out.println("\n=================================================================");
-        System.out.println("               VISTA FINAL DEL DOCUMENTO EXPORTADO               ");
-        System.out.println("=================================================================");
-        System.out.println("REPORTE NRO: " + idReporte + " | ASUNTO: " + tipoReporte);
-        System.out.println("DESCRIPCIÓN DEL ENCARGADO:\n");
-        System.out.println(this.descripcion.trim().isEmpty() ? "  (Vacío)" : "  \"" + this.descripcion + "\"");
-        System.out.println("=================================================================\n");
-    }
+    public String getIdReporte() { return idReporte; }
+    public Date getFechaIni() { return fechaIni; }      
+    public Date getFechaFin() { return fechaFin; }
+    public String getTipoReporte() { return tipoReporte; }
+    public String getDescripcion() { return descripcion; }  
+
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 }

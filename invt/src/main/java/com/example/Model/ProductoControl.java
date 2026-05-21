@@ -28,7 +28,6 @@ public class ProductoControl {
                 return producto;
             }
         }
-
         System.out.println("Producto con ID " + id + " no encontrado.");
         return null;
     }
@@ -43,7 +42,6 @@ public class ProductoControl {
                                    ", Stock: " + producto.getStock());
             }
         }
-        
         return this.productos;
     }
 }

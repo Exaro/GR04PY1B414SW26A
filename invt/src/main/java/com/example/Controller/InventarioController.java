@@ -28,8 +28,6 @@ public class InventarioController {
         // CASO DE PRUEBA 1: Insertar a través del método nativo del modelo
         modeloControl.agregarProducto(new Producto("P001", "Camiseta", "Algodón liviano", "M", "Negro", 15.0, 20, true, "Nike"));
         modeloControl.agregarProducto(new Producto("P002", "Jeans Slim Fit", "Mezclilla elástica", "32", "Azul", 59.99, 3, true, "Levi's"));
-        modeloControl.listarProductos();
-
     }
 
     private void refrescarTablaDesdeModelo() {
@@ -37,6 +35,9 @@ public class InventarioController {
         vista.getProductos().setAll(modeloControl.listarProductos());
     }
 
+    /**
+     * 
+     */
     private void inicializarEventos() {
         
         // ==========================================
@@ -58,15 +59,12 @@ public class InventarioController {
             
             // CASO DE PRUEBA 3: Se ejecuta eliminarProducto(id) en ProductoControl
             modeloControl.eliminarProducto(seleccionado.getIdProducto());
-            
+           inventario.historiales.add("[" + new Date() + "] SE ELIMINÓ -> " + seleccionado.getNombre());
             // Se actualiza la interfaz
             refrescarTablaDesdeModelo();
             mostrarAlerta("Éxito", "Producto Eliminado", "Producto eliminado de la lista de ProductoControl.", Alert.AlertType.INFORMATION);
         });
 
-        // ==========================================
-        // CASO DE USO 2: MOVIMIENTOS DE STOCK
-        // ==========================================
         // ==========================================
         // CASO DE USO 2: MOVIMIENTOS DE STOCK
         // ==========================================
@@ -116,79 +114,330 @@ public class InventarioController {
         });
 
         // ==========================================
-        // TU BOTÓN DE PRUEBA (Ahora sí va a funcionar)
-        // ==========================================
-        // ==========================================
-        // TU BOTÓN DE PRUEBA (Ahora en una Ventana Gráfica)
+        // TU BOTÓN DE PRUEBA 
         // ==========================================
         vista.getBtnPruebaMov().setOnAction(e -> {
-            // 1. Obtenemos la lista real de movimientos
-            java.util.List<com.example.Model.MovimientoProducto> lista = inventario.verMovimientos();
-            
-            // 2. Construimos la cadena de texto para la ventana
-            StringBuilder sb = new StringBuilder();
-            sb.append("========================================\n");
-            sb.append("      AUDITORÍA DE MOVIMENTOS DE BODEGA \n");
-            sb.append("========================================\n\n");
-            
-            if (lista.isEmpty()) {
-                sb.append("[INFO] No hay movimientos registrados en esta sesión.");
-            } else {
-                sb.append("Total de transacciones: (").append(lista.size()).append(")\n\n");
-                for (com.example.Model.MovimientoProducto mp : lista) {
-                    sb.append("» Transacción: ").append(mp.getIdMovimiento()).append("\n");
-                    sb.append("  Fecha: ").append(mp.getFecha()).append("\n");
-                    
-                    for (com.example.Model.DetalleMovimiento dm : mp.detalle) {
-                        String accion = dm.getTipo().equalsIgnoreCase("ENTRADA") ? "[ENTRADA]" : "[SALIDA]";
-                        sb.append("  • ").append(accion).append(" ")
-                          .append(dm.getProducto().getNombre()).append(" x")
-                          .append(dm.getCantidadProductos()).append(" uds.\n");
-                    }
-                    sb.append("----------------------------------------------------------------------\n");
-                }
-            }
-            
-            // 3. Montamos un TextArea para que tenga barra de scroll si el historial es muy largo
-            TextArea textArea = new TextArea(sb.toString());
-            textArea.setEditable(false);
-            textArea.setWrapText(true);
-            textArea.setPrefWidth(500);
-            textArea.setPrefHeight(400);
-            textArea.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 13px;"); // Fuente tipo consola para que se vea ordenado
+           Producto seleccionado = vista.getTabla()
+        .getSelectionModel()
+        .getSelectedItem();
 
-            // 4. Desplegamos la alerta gráfica
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Bitácora de Auditoría");
-            alert.setHeaderText("Historial Transaccional de la Sesión");
-            alert.getDialogPane().setContent(textArea); // Inyectamos el cuadro de texto
-            alert.showAndWait();
+    if (seleccionado == null) {
+
+        mostrarAlerta(
+            "Atención",
+            "Producto no seleccionado",
+            "Seleccione un producto.",
+            Alert.AlertType.WARNING
+        );
+
+        return;
+    }
+
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("========================================\n");
+    sb.append("   HISTORIAL MOVIMIENTOS PRODUCTO\n");
+    sb.append("========================================\n\n");
+
+    sb.append("Producto: ")
+      .append(seleccionado.getNombre())
+      .append("\n\n");
+
+    boolean encontrado = false;
+
+    for (MovimientoProducto mp : inventario.movimientos) {
+
+        for (DetalleMovimiento dm : mp.detalle) {
+
+            if (dm.getProducto()
+                  .getIdProducto()
+                  .equals(seleccionado.getIdProducto())) {
+
+                encontrado = true;
+
+                sb.append("Transacción: ")
+                  .append(mp.getIdMovimiento())
+                  .append("\n");
+
+                sb.append("Fecha: ")
+                  .append(mp.getFecha())
+                  .append("\n");
+
+                sb.append("Tipo: ")
+                  .append(dm.getTipo())
+                  .append("\n");
+
+                sb.append("Cantidad: ")
+                  .append(dm.getCantidadProductos())
+                  .append("\n");
+
+                sb.append("-----------------------------------\n");
+            }
+        }
+    }
+
+    if (!encontrado) {
+
+        sb.append("No existen movimientos para este producto.");
+    }
+
+    TextArea area = new TextArea(sb.toString());
+
+    area.setEditable(false);
+    area.setWrapText(true);
+
+    area.setPrefWidth(600);
+    area.setPrefHeight(450);
+
+    area.setStyle(
+        "-fx-font-family: 'Courier New';" +
+        "-fx-font-size: 13px;"
+    );
+
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+    alert.setTitle("Historial Movimientos");
+
+    alert.setHeaderText(
+        "Movimientos del producto seleccionado"
+    );
+
+    alert.getDialogPane().setContent(area);
+
+    alert.showAndWait();
         });
 
         // ==========================================
         // CASO DE USO 3: REPORTE DE TIENDA
         // ==========================================
-        vista.getBtnGenerarReporteEscrito().setOnAction(e -> {
-            Date fechaActual = new Date();
-            Reporte miReporte = new Reporte("REP-2026", fechaActual, fechaActual, "Alerta de Stock Crítico");
+       vista.getBtnGenerarReporteEscrito().setOnAction(e -> {
 
-            TextInputDialog dialogoCritica = new TextInputDialog();
-            dialogoCritica.setTitle("Redactar Reporte");
-            dialogoCritica.setHeaderText("Ingrese observaciones de la tienda:");
-            Optional<String> observacion = dialogoCritica.showAndWait();
-            
-            if (observacion.isPresent()) {
-                miReporte.generarReporte(); // Ejecuta cabecera nativa
-                System.out.println("[CRÍTICA INCORPORADA]: " + observacion.get());
-                miReporte.exportarReporte();
-                mostrarAlerta("Reporte", "Completado", "Consulte los logs de la consola.", Alert.AlertType.INFORMATION);
-            }
-        });
+    Producto seleccionado = vista.getTabla().getSelectionModel().getSelectedItem();
+
+    if (seleccionado == null) {
+        mostrarAlerta(
+            "Atención",
+            "Producto no seleccionado",
+            "Seleccione un producto.",
+            Alert.AlertType.WARNING
+        );
+        return;
+    }
+
+    Dialog<ButtonType> dialog = new Dialog<>();
+
+    dialog.setTitle("Generar Reporte");
+
+    dialog.getDialogPane().getButtonTypes().addAll(
+        ButtonType.OK,
+        ButtonType.CANCEL
+    );
+
+    GridPane grid = new GridPane();
+
+    grid.setHgap(10);
+    grid.setVgap(10);
+    grid.setPadding(new Insets(20));
+
+    ComboBox<String> tipoBox = new ComboBox<>();
+
+    tipoBox.getItems().addAll(
+        "Producto Dañado",
+        "Bajo Stock"
+    );
+
+    tipoBox.setValue("Bajo Stock");
+
+    TextArea descripcionArea = new TextArea();
+
+    descripcionArea.setPromptText(
+        "Escriba observaciones..."
+    );
+
+    DatePicker fechaInicio = new DatePicker();
+    DatePicker fechaFin = new DatePicker();
+
+    grid.add(new Label("Tipo Reporte:"), 0, 0);
+    grid.add(tipoBox, 1, 0);
+
+    grid.add(new Label("Fecha Inicio:"), 0, 1);
+    grid.add(fechaInicio, 1, 1);
+
+    grid.add(new Label("Fecha Fin:"), 0, 2);
+    grid.add(fechaFin, 1, 2);
+
+    grid.add(new Label("Descripción:"), 0, 3);
+    grid.add(descripcionArea, 1, 3);
+
+    dialog.getDialogPane().setContent(grid);
+
+    Optional<ButtonType> resultado = dialog.showAndWait();
+
+    if (resultado.isPresent() &&
+        resultado.get() == ButtonType.OK) {
+
+        Reporte reporte = new Reporte(
+
+            "REP-" + (inventario.reportesGenerados.size() + 1),
+
+            new Date(),
+
+            new Date(),
+
+            tipoBox.getValue()
+        );
+
+        reporte.setDescripcion(
+
+            "Producto: "
+            + seleccionado.getNombre()
+            + " | "
+            + descripcionArea.getText()
+        );
+
+        inventario.reportesGenerados.add(reporte);
+
+        mostrarAlerta(
+            "Reporte generado",
+            "Proceso exitoso",
+            "Reporte registrado correctamente.",
+            Alert.AlertType.INFORMATION
+        );
+    }
+});
 
         vista.getBtnPrueba().setOnAction(e -> {
             modeloControl.listarProductos();
         });
+
+        vista.getBtnHistorialProductos().setOnAction(e -> {
+
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("====================================\n");
+    sb.append("    HISTORIAL DE PRODUCTOS\n");
+    sb.append("====================================\n\n");
+
+    if (inventario.historiales.isEmpty()) {
+
+        sb.append("No existen registros.");
+
+    } 
+
+    TextArea area = new TextArea(sb.toString());
+
+    area.setEditable(false);
+
+    area.setWrapText(true);
+
+    area.setPrefWidth(600);
+
+    area.setPrefHeight(400);
+
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+    alert.setTitle("Historial Productos");
+
+    alert.setHeaderText(
+        "Altas y bajas de productos"
+    );
+
+    alert.getDialogPane().setContent(area);
+
+    alert.showAndWait();
+        });
+        
+       vista.getBtnHistorialReportes().setOnAction(e -> {
+
+    Producto seleccionado = vista.getTabla().getSelectionModel().getSelectedItem();
+
+    if (seleccionado == null) {
+        mostrarAlerta(
+            "Atención",
+            "Producto no seleccionado",
+            "Seleccione un producto de la tabla.",
+            Alert.AlertType.WARNING
+        );
+        return;
     }
+
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("====================================\n");
+    sb.append("     HISTORIAL GENERAL REPORTES\n");
+    sb.append("====================================\n\n");
+
+    sb.append("Producto Seleccionado: ")
+      .append(seleccionado.getNombre())
+      .append("\n\n");
+
+    boolean encontrado = false;
+
+    for (Reporte r : inventario.reportesGenerados) {
+
+        // Como Reporte NO tiene Producto,
+        // filtramos usando la descripción
+
+        if (r.getDescripcion() != null &&
+            r.getDescripcion().contains(seleccionado.getNombre())) {
+
+            encontrado = true;
+
+            sb.append("ID Reporte: ")
+              .append(r.getIdReporte())
+              .append("\n");
+
+            sb.append("Tipo Reporte: ")
+              .append(r.getTipoReporte())
+              .append("\n");
+
+            sb.append("Fecha Inicio: ")
+              .append(r.getFechaIni())
+              .append("\n");
+
+            sb.append("Fecha Fin: ")
+              .append(r.getFechaFin())
+              .append("\n");
+
+            sb.append("Descripción:\n")
+              .append(r.getDescripcion())
+              .append("\n");
+
+            sb.append("------------------------------------\n");
+        }
+    }
+
+    if (!encontrado) {
+        sb.append("No existen reportes asociados a este producto.");
+    }
+
+    TextArea area = new TextArea(sb.toString());
+
+    area.setEditable(false);
+    area.setWrapText(true);
+
+    area.setPrefWidth(600);
+    area.setPrefHeight(450);
+
+    area.setStyle(
+        "-fx-font-family: 'Courier New';" +
+        "-fx-font-size: 13px;"
+    );
+
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+    alert.setTitle("Historial de Reportes");
+
+    alert.setHeaderText(
+        "Reportes encontrados del producto"
+    );
+
+    alert.getDialogPane().setContent(area);
+
+    alert.showAndWait();
+});
+    }
+
 
     private void abrirDialogoAgregarProducto() {
         Dialog<Producto> dialog = new Dialog<>();
@@ -247,6 +496,11 @@ public class InventarioController {
         resultado.ifPresent(nuevoProducto -> {
             // PROCEDIMIENTO CASO 1: Se llama al método agregarProducto(p) de ProductoControl
             modeloControl.agregarProducto(nuevoProducto);
+             inventario.historiales.add(
+                    "[" + new Date() + "] "
+                    + "SE AGREGÓ -> "
+                    + nuevoProducto.getNombre()
+                );
             // El sistema actualiza la pantalla
             refrescarTablaDesdeModelo();
         });
